@@ -178,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const response =
                     await fetch(
-                        "/capture-lead",
+                        "/api/capture-lead",
                         {
                             method: "POST",
 
@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 downloadLink.href =
                     data.downloadUrl ||
-                    "/download-ebook";
+                    "/api/download-ebook";
 
                 downloadLink.download =
                     "B3-Bounce-Back-Better.pdf";

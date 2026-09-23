@@ -77,7 +77,7 @@ module.exports = async (req, res) => {
 
             return res.status(500).json({
                 success: false,
-                message: "Server configuration error."
+                message: "RESEND_API_KEY is missing on the server."
             });
         }
 
@@ -88,13 +88,11 @@ module.exports = async (req, res) => {
 
         if (!process.env.RESEND_SEGMENT_ID) {
 
-            console.error(
-                "RESEND_SEGMENT_ID is missing."
-            );
+            console.error("RESEND_SEGMENT_ID is missing.");
 
             return res.status(500).json({
                 success: false,
-                message: "Server configuration error."
+                message: ("RESEND_SEGMENT_ID is missing.");
             });
         }
 

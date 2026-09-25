@@ -10,7 +10,6 @@ const ebookPath = path.join(
 );
 
 module.exports = async (req, res) => {
-
     // Only allow POST requests
     if (req.method !== "POST") {
         return res.status(405).json({
@@ -20,7 +19,6 @@ module.exports = async (req, res) => {
     }
 
     try {
-
         // ----------------------------------
         // GET EMAIL
         // ----------------------------------
@@ -31,7 +29,6 @@ module.exports = async (req, res) => {
         console.log("NEW B3 LEAD");
         console.log("========================================");
         console.log("Email:", email);
-
 
         // ----------------------------------
         // VALIDATE EMAIL
@@ -44,6 +41,14 @@ module.exports = async (req, res) => {
             });
         }
 
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailPattern.test(email)) {
+            return res.status(400).json({
+                success: false,
+                message: "Please enter a valid email address."
+            });
+        }
 
         // ----------------------------------
         // CHECK B3 PDF
@@ -52,11 +57,7 @@ module.exports = async (req, res) => {
         console.log("Checking B3 PDF...");
 
         if (!fs.existsSync(ebookPath)) {
-
-            console.error(
-                "B3 PDF not found:",
-                ebookPath
-            );
+            console.error("B3 PDF not found:", ebookPath);
 
             return res.status(500).json({
                 success: false,
@@ -64,16 +65,12 @@ module.exports = async (req, res) => {
             });
         }
 
-
         // ----------------------------------
         // CHECK RESEND API KEY
         // ----------------------------------
 
         if (!process.env.RESEND_API_KEY) {
-
-            console.error(
-                "RESEND_API_KEY is missing."
-            );
+            console.error("RESEND_API_KEY is missing.");
 
             return res.status(500).json({
                 success: false,
@@ -81,21 +78,18 @@ module.exports = async (req, res) => {
             });
         }
 
-
         // ----------------------------------
         // CHECK RESEND SEGMENT ID
         // ----------------------------------
 
         if (!process.env.RESEND_SEGMENT_ID) {
-
             console.error("RESEND_SEGMENT_ID is missing.");
 
             return res.status(500).json({
                 success: false,
-                message: ("RESEND_SEGMENT_ID is missing.");
+                message: "RESEND_SEGMENT_ID is missing."
             });
         }
-
 
         // ----------------------------------
         // CONNECT TO RESEND
@@ -105,52 +99,38 @@ module.exports = async (req, res) => {
             process.env.RESEND_API_KEY
         );
 
-
         console.log(
             "Segment ID:",
             process.env.RESEND_SEGMENT_ID
         );
 
-
         // ----------------------------------
-        // ADD CONTACT TO RESEND SEGMENT
+        // ADD CONTACT TO RESEND
         // ----------------------------------
 
-        const {
-            data,
-            error
-        } = await resend.contacts.create({
-
-            email: email,
-
-            unsubscribed: false,
-
-            segments: [
-                {
-                    id: process.env.RESEND_SEGMENT_ID
-                }
-            ]
-
-        });
-
+        const { data, error } =
+            await resend.contacts.create({
+                email: email,
+                unsubscribed: false,
+                segments: [
+                    {
+                        id: process.env.RESEND_SEGMENT_ID
+                    }
+                ]
+            });
 
         // ----------------------------------
         // RESEND ERROR
         // ----------------------------------
 
         if (error) {
-
-            console.error(
-                "RESEND ERROR:",
-                error
-            );
+            console.error("RESEND ERROR:", error);
 
             return res.status(500).json({
                 success: false,
                 message: "We could not process your email."
             });
         }
-
 
         // ----------------------------------
         // SUCCESS
@@ -160,24 +140,14 @@ module.exports = async (req, res) => {
         console.log("B3 LEAD SUCCESS");
         console.log("========================================");
 
-
         return res.status(200).json({
-
             success: true,
-
             message: "Your B3 ebook is ready.",
-
             downloadUrl: "/api/download-ebook"
-
         });
 
-
     } catch (error) {
-
-        console.error(
-            "B3 LEAD ERROR:",
-            error
-        );
+        console.error("B3 LEAD ERROR:", error);
 
         return res.status(500).json({
             success: false,
